@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pressure_switch" translatable="false">Display pressure</string>
+    <string name="pressure_speed_wind" translatable="false">Display wind speed</string>
+    <string name="pressure_wetness" translatable="false">Display wetness</string>
+    <string name="spinner_headline" translatable="false">Select historyCity</string>
+    <string name="app_name_weather">Weather</string>
+    <string name="addcity">Save settings</string>
+</resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_margin="5dp"
+    android:background="#CC51FA36"
+    android:elevation = "1dp"
+    card_view:cardCornerRadius="20dp"
+    app:cardElevation="5dp"
+
+    >
+<RelativeLayout
+    android:id="@+id/layout_city1"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    tools:ignore="ExtraText"
+    android:background="#CC51FA36"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_weather"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/sun" />
+
+        <TextView
+            android:id="@+id/text_view_city_temperature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_view_city"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@id/delCity"
+        android:layout_toEndOf="@id/layout_weather"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:textSize="20dp"
+        />
+
+    <ImageButton
+        android:id="@+id/delCity"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center"
+        android:background="#CC60FA36"
+        android:src="@drawable/close" />
+
+</RelativeLayout>
+</androidx.cardview.widget.CardView>

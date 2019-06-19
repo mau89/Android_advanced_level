@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name" translatable="false">MyApplication</string>
+    <string name="app_name_weather">Погода</string>
+    <!--Layout fragment_adding_cities.xml-->
+    <string name="pressure_switch">Отображать давление</string>
+    <string name="pressure_speed_wind">Отображать скорость ветра</string>
+    <string name="pressure_wetness">Отображать влажность</string>
+    <string name="spinner_headline">Выберите город</string>
+    <string name="addcity">Сохранить настройки</string>
+    <string name="Wind_speed">4 m/s</string>
+    <string name="Humidity">74 %</string>
+    <string name="Pressure">1009 hpa</string>
+    <string name="TextUpdate">LAST UPDATE SAT 27 MAY 2019</string>
+</resources>

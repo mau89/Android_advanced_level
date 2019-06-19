@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddingCitiesFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Spinner
+            android:id="@+id/select_city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20sp"
+            android:prompt="@string/spinner_headline"/>
+
+        <Switch
+            android:id="@+id/pressure_speed_wind"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20sp"
+            android:checked="true"
+            android:showText="true"
+            android:text="@string/pressure_speed_wind" />
+
+        <Switch
+            android:id="@+id/pressure_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20sp"
+            android:checked="true"
+            android:showText="true"
+            android:text="@string/pressure_switch"
+            tools:checked="true" />
+
+        <Switch
+            android:id="@+id/pressure_wetness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20sp"
+            android:checked="true"
+            android:showText="true"
+            android:text="@string/pressure_wetness"
+            tools:checked="true" />
+
+        <Button
+            android:id="@+id/add_city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/addcity"
+            android:layout_gravity="bottom"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
