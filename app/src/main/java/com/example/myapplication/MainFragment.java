@@ -1,7 +1,12 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +31,11 @@ import timber.log.Timber;
 public class MainFragment extends Fragment {
     private CityDataBaseHelper cityDataBaseHelper;
     private SQLiteDatabase database;
+    private SensorManager sensorManager;
+    private Sensor sensorAmbientTemperature;
+    private Sensor sensorRelativeHumidity;
+    private TextView textViewAmbientTemperature;
+    private TextView textViewRelativeHumidity;
 
     private static List<HistoryCity> generateCity() {
         List<HistoryCity> historyCityList = new ArrayList<>();
@@ -58,13 +68,59 @@ public class MainFragment extends Fragment {
         cityDataBaseHelper = ((App) getActivity().getApplication()).getCityDataBaseHelper();
         database = cityDataBaseHelper.getReadableDatabase();
 
+        textViewAmbientTemperature = view.findViewById(R.id.ambient_temperature);
+        textViewRelativeHumidity = view.findViewById(R.id.relative_humidity);
         String city = ((App) getActivity().getApplication()).getPreferences().getString(Preferences.Key.CITY);
         Timber.d(city);
         if (!city.isEmpty()) {
             loadCity(city, view);
         }
         setUpRecyclerView(view.findViewById(R.id.linerHistory));
+        showSensors();
         return view;
+    }
+
+    private void showSensors() {
+        sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        sensorAmbientTemperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        sensorRelativeHumidity = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+        if (sensorAmbientTemperature != null) {
+            sensorManager.registerListener(listenerAmbientTemperature, sensorAmbientTemperature,
+                    SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if (sensorRelativeHumidity != null) {
+            sensorManager.registerListener(listenerRelativeHumidity, sensorRelativeHumidity,
+                    SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    private SensorEventListener listenerAmbientTemperature = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            showSensorAmbientTemperature(event);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
+    private SensorEventListener listenerRelativeHumidity = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            showSensorRelativeHumidity(event);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
+
+    private void showSensorAmbientTemperature(SensorEvent event) {
+        textViewAmbientTemperature.setText(new StringBuilder().append("").append(event.values[0]).toString());
+    }
+
+    private void showSensorRelativeHumidity(SensorEvent event) {
+        textViewRelativeHumidity.setText(new StringBuilder().append("").append(event.values[0]).toString());
     }
 
     private void setUpRecyclerView(LinearLayout historyLayout) {
@@ -118,6 +174,13 @@ public class MainFragment extends Fragment {
         super.onDestroyView();
         database.close();
         cityDataBaseHelper.close();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(listenerRelativeHumidity, sensorRelativeHumidity);
+        sensorManager.unregisterListener(listenerAmbientTemperature, sensorAmbientTemperature);
     }
 }
 
