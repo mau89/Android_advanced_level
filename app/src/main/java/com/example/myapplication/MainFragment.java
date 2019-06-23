@@ -58,12 +58,6 @@ public class MainFragment extends Fragment {
         cityDataBaseHelper = ((App) getActivity().getApplication()).getCityDataBaseHelper();
         database = cityDataBaseHelper.getReadableDatabase();
 
-        view.findViewById(R.id.menu).setOnClickListener(v ->
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.container, new MenuFragment())
-                        .addToBackStack(MainFragment.class.getName())
-                        .commit());
-        view.findViewById(R.id.info).setOnClickListener(v -> System.out.println("info"));
         String city = ((App) getActivity().getApplication()).getPreferences().getString(Preferences.Key.CITY);
         Timber.d(city);
         if (!city.isEmpty()) {

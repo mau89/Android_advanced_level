@@ -11,4 +11,21 @@
     <string name="Humidity">74 %</string>
     <string name="Pressure">1009 hpa</string>
     <string name="TextUpdate">LAST UPDATE SAT 27 MAY 2019</string>
+    <string name="tool_bar_search">Search</string>
+    <string name="info">info</string>
+    <string name="action_settings">Добавить город</string>
+    <string name="menu_home">Домой</string>
+    <string name="menu_gallery">Галерея</string>
+    <string name="menu_slideshow">Слайд шоу</string>
+    <string name="menu_tools">Инструменты</string>
+    <string name="menu_share">О разработчике</string>
+    <string name="menu_send">Связь с разработчиком</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Пользователь</string>
+    <string name="nav_header_subtitle">Данные пользователя</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="developer">Разработчик Михайлишин Александр</string>
+    <string name="send">Отправить</string>
+    <string name="ok">Ok</string>
 </resources>

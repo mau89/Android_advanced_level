@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,7 +40,6 @@ public class MenuFragment extends Fragment {
 
         cityDataBaseHelper = ((App) getActivity().getApplication()).getCityDataBaseHelper();
         database = cityDataBaseHelper.getReadableDatabase();
-
         view.findViewById(R.id.add_location).setOnClickListener(v -> {
             ((App) getActivity().getApplication()).getPreferences().putString("", Preferences.Key.EDIT_CITY);
             getFragmentManager().beginTransaction()
@@ -126,12 +124,6 @@ public class MenuFragment extends Fragment {
 //            }
 //            deleteRow(String.valueOf(idCity));
 //            cityAddAdapter.removeItem(object);
-//        });
-//        ImageButton button = cityAddAdapter.getfindViewById(R.id.delCity);
-//        button.setOnClickListener(v -> {
-//            System.out.println("sdfsjflsdf");
-////            deleteRow(String.valueOf(currentID));
-////            onResume();
 //        });
         recyclerView.setAdapter(cityAddAdapter);
         historyLayout.addView(historyView);
