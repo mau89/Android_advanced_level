@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -21,8 +23,12 @@ import com.example.myapplication.data.CityDataBaseHelper;
 import com.example.myapplication.data.VillageAdd;
 import com.example.myapplication.utils.Preferences;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -33,6 +39,9 @@ public class MenuFragment extends Fragment {
     private static final int IDM_OPEN = 101;
     private View view;
     private int idCity;
+    private final Handler handler = new Handler();
+    private String currentTextText;
+    private CityAddAdapter cityAddAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,14 +85,62 @@ public class MenuFragment extends Fragment {
             int currentID = cursor.getInt(cursor.getColumnIndex(CityDataBaseHelper.KEY_ID));
             String APP_PREFERENCES_cityName = cursor.getString(cursor.getColumnIndex(CityDataBaseHelper.APP_PREFERENCES_cityName));
             Timber.d(APP_PREFERENCES_cityName);
-            if (APP_PREFERENCES_cityName.substring(0, 2).equals("п.")) {
-                cityAdds.add(new VillageAdd(APP_PREFERENCES_cityName, ((int) (Math.random() * 10)) + " \u2103", currentID));
+            updateWeatherData(APP_PREFERENCES_cityName);
+            if (APP_PREFERENCES_cityName == null) {
+                deleteRow(String.valueOf(currentID));
+            } else if (APP_PREFERENCES_cityName.substring(0, 2).equals("п.")) {
+
+                cityAdds.add(new VillageAdd(APP_PREFERENCES_cityName, currentTextText, currentID));
             } else {
-                cityAdds.add(new CityAdd(APP_PREFERENCES_cityName, ((int) (Math.random() * 10)) + " \u2103", currentID));
+                cityAdds.add(new CityAdd(APP_PREFERENCES_cityName, currentTextText, currentID));
             }
         }
         setUpRecyclerView(view.findViewById(R.id.linear_city));
         cursor.close();
+    }
+
+    private void updateWeatherData(final String city) {
+        new Thread() {
+            @Override
+            public void run() {
+                final JSONObject jsonObject = WeatherCurrentDay.getJSONData(city);
+                if (jsonObject == null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity().getApplicationContext(), "Place not found", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } else {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            renderWeather(jsonObject);
+                        }
+                    });
+                }
+            }
+        }.start();
+    }
+
+    private void renderWeather(JSONObject jsonObject) {
+        Timber.d("json: " + jsonObject.toString());
+        try {
+            JSONObject details = jsonObject.getJSONArray("weather").getJSONObject(0);
+            JSONObject main = jsonObject.getJSONObject("main");
+
+            setCurrentTemp(main);
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            Timber.e("One or more fields not found in the JSON data");
+        }
+    }
+
+    private void setCurrentTemp(JSONObject main) throws JSONException {
+        currentTextText = String.format(Locale.getDefault(), "%.1f", main.getDouble("temp"))
+                + " \u2103";
+        cityAddAdapter.notifyDataSetChanged();
     }
 
     private void setUpRecyclerView(LinearLayout historyLayout) {
@@ -92,7 +149,7 @@ public class MenuFragment extends Fragment {
                 .inflate(R.layout.layout_city_list, historyLayout, false);
         RecyclerView recyclerView = historyView.findViewById(R.id.recycler_city_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
-        CityAddAdapter cityAddAdapter = new CityAddAdapter(cityAdds);
+        cityAddAdapter = new CityAddAdapter(cityAdds);
         cityAddAdapter.notifyDataSetChanged();
         cityAddAdapter.setOnClickCity(objects -> {
             if (objects instanceof CityAdd) {

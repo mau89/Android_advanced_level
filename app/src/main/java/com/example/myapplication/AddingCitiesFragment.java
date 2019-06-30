@@ -25,7 +25,7 @@ import timber.log.Timber;
 public class AddingCitiesFragment extends Fragment {
     private CityDataBaseHelper cityDataBaseHelper;
     private SQLiteDatabase database;
-    private String[] city = {"Выберите город", "Москва", "Санкт-Петербург", "п. Пойковский", "Самара", "Тюмень", "п. Городище", "Владивосток"};
+    private String[] city = {"Выберите город", "Москва", "Санкт-Петербург", "Самара", "Тюмень", "Уфа", "Владивосток", "Новосибирск"};
     private String city1;
     private Spinner spinner;
 

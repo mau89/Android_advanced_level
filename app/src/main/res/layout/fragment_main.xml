@@ -51,31 +51,33 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imageView"
+        <TextView
+            android:id="@+id/weather_icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="20"
-            app:srcCompat="@drawable/sun" />
+            android:textSize="80sp"
+            android:layout_centerHorizontal="true"
+             />
 
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/weather_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="SUN"
+
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/currentTemperatureTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
             android:gravity="center"
-            android:text="30 \u2103"
+
             android:textColor="#FFFFFF"
             android:textSize="50sp" />
 
@@ -86,32 +88,29 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/Pressure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/Pressure"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/Humidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/Humidity"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/Wind"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/Wind_speed"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>
@@ -136,38 +135,36 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/updatedTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="@string/TextUpdate"
+
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:weightSum="2"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/textView14"
+                android:id="@+id/sunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left|center"
-                android:text="05:57 sunrise"
+                android:gravity="start|center"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/sunset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="right|center"
-                android:text="17:44 sunset"
+                android:gravity="end|center"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
     <dist:module dist:instant="true" />
 
     <application
@@ -12,14 +13,22 @@
         android:label="@string/app_name_weather"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <service
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="false">
 
-        android:theme="@style/AppTheme">
-        <!--<activity android:name=".AddingCitiesFragment"></activity>-->
-        <!--<activity android:name=".MenuFragment" />-->
+        </service>
+        <!-- <activity android:name=".AddingCitiesFragment"></activity> -->
+        <!-- <activity android:name=".MenuFragment" /> -->
         <activity
             android:name=".MainActivity"
-            android:screenOrientation ="portrait"
-            android:theme="@style/AppTheme.NoActionBar">>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="ExtraText">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
