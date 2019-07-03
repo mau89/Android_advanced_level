@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,17 +22,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
+        setToolbar();
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new MainFragment())
@@ -41,6 +30,17 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void setToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements
                     .commit();
             return true;
         } else if (id == R.id.action_info) {
-            Toast.makeText(this, "Информация в разработке!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.Information_in_development, Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -67,25 +67,23 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
-
         if (id == R.id.nav_home) {
-            Toast.makeText(this, "Домой", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.home), Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_tools) {
-            Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.settings), Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_about_developer) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new AboutDeveloperFragment())
                     .addToBackStack(MainFragment.class.getName())
                     .commit();
-            Toast.makeText(this, "О разработчике", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.about_the_developer), Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_send_developer) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new SendDeveloperFragment())
                     .addToBackStack(MainFragment.class.getName())
                     .commit();
-            Toast.makeText(this, "Сообщение разработчику", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.Message_to_developer), Toast.LENGTH_SHORT).show();
         }
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

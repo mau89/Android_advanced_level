@@ -6,11 +6,7 @@
     <string name="pressure_speed_wind">Отображать скорость ветра</string>
     <string name="pressure_wetness">Отображать влажность</string>
     <string name="spinner_headline">Выберите город</string>
-    <string name="addcity">Сохранить настройки</string>
-    <string name="Wind_speed">4 m/s</string>
-    <string name="Humidity">74 %</string>
-    <string name="Pressure">1009 hpa</string>
-    <string name="TextUpdate">LAST UPDATE SAT 27 MAY 2019</string>
+    <string name="addCity">Сохранить настройки</string>
     <string name="tool_bar_search">Search</string>
     <string name="info">info</string>
     <string name="action_settings">Добавить город</string>
@@ -27,13 +23,14 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="developer">Разработчик Михайлишин Александр</string>
     <string name="send">Отправить</string>
-    <string name="ok">Ok</string>
-    <string name="weather_sunny">&#xf00d;</string>
-    <string name="weather_clear_night">&#xf02e;</string>
-    <string name="weather_foggy">&#xf014;</string>
-    <string name="weather_cloudy">&#xf013;</string>
-    <string name="weather_rainy">&#xf019;</string>
-    <string name="weather_snowy">&#xf01b;</string>
-    <string name="weather_thunder">&#xf01e;</string>
-    <string name="weather_drizzle">&#xf01c;</string>
+    <string name="ok">OK</string>
+    <string name="network_error">Проблемы с сетью!</string>
+    <string name="next_days" translatable="false">Next 14 Days</string>
+    <string name="communicate" translatable="false">Communicate</string>
+    <string name="Information_in_development">Информация в разработке!</string>
+    <string name="home">Домой</string>
+    <string name="settings">Настройки</string>
+    <string name="about_the_developer">О разработчике</string>
+    <string name="Message_to_developer">Сообщение разработчику</string>
+
 </resources>

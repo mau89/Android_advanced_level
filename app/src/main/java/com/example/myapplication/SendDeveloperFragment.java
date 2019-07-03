@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.Objects;
+
 public class SendDeveloperFragment extends Fragment {
     @Nullable
     @Override
@@ -19,7 +21,7 @@ public class SendDeveloperFragment extends Fragment {
         Button button = view.findViewById(R.id.send_developer);
         button.setOnClickListener(v -> {
             Toast.makeText(getActivity(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
-            getActivity().onBackPressed();
+            Objects.requireNonNull(getActivity()).onBackPressed();
         });
         return view;
 

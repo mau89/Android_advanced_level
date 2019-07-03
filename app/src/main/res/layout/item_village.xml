@@ -7,19 +7,17 @@
     android:layout_height="80dp"
     android:layout_margin="5dp"
     android:background="#03A9F5"
-    android:elevation = "1dp"
-    card_view:cardCornerRadius="20dp"
+    android:elevation="1dp"
     app:cardElevation="5dp"
-
-    >
+    card_view:cardCornerRadius="20dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/layout_village"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="#03A9F5"
+        android:orientation="vertical"
         tools:ignore="RedundantNamespace">
 
         <LinearLayout
@@ -30,7 +28,6 @@
             android:orientation="vertical">
 
             <ImageView
-
                 android:layout_width="50sp"
                 android:layout_height="50sp"
                 android:layout_gravity="center"
@@ -42,7 +39,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center" />
-
         </LinearLayout>
 
         <TextView
@@ -53,7 +49,7 @@
             android:layout_toStartOf="@id/del_village"
             android:layout_toEndOf="@id/layout_weather"
             android:gravity="center"
-            android:textSize="18dp" />
+            android:textSize="18sp" />
 
         <ImageButton
             android:id="@+id/del_village"
@@ -62,8 +58,8 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_gravity="center_vertical"
-            android:background="#03A9F5"
             android:layout_marginBottom="0dp"
+            android:background="#03A9F5"
             android:src="@drawable/close" />
 
     </RelativeLayout>

@@ -9,10 +9,10 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,10 +24,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.data.CityDataBaseHelper;
 import com.example.myapplication.data.HistoryCity;
+import com.example.myapplication.rest.OpenWeatherRepo;
+import com.example.myapplication.rest.entities.WeatherRequestRestFiveDayModel;
+import com.example.myapplication.rest.entities.WeatherRequestRestOneDayModel;
 import com.example.myapplication.utils.Preferences;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -36,7 +38,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class MainFragment extends Fragment {
@@ -48,25 +54,38 @@ public class MainFragment extends Fragment {
     private TextView textViewAmbientTemperature;
     private TextView textViewRelativeHumidity;
     private String cityName;
-    private final Handler handler = new Handler();
     private View view;
+    private List<HistoryCity> historyCityList;
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_main, container, false);
+
+        cityDataBaseHelper = ((App) Objects.requireNonNull(getActivity()).getApplication()).getCityDataBaseHelper();
+        database = cityDataBaseHelper.getReadableDatabase();
+
+        textViewAmbientTemperature = view.findViewById(R.id.ambient_temperature);
+        textViewRelativeHumidity = view.findViewById(R.id.relative_humidity);
+
+        String city = ((App) getActivity().getApplication()).getPreferences().getString(Preferences.Key.CITY);
+        Timber.d(city);
+        if (!city.isEmpty()) {
+            loadCity(city, view);
+        }
+        updateWeatherFiveDayData(city);
+        setUpRecyclerView(view.findViewById(R.id.linerHistory));
+        showSensors();
+        updateWeatherOneDayData(cityName);
+        return view;
+    }
 
     private List<HistoryCity> generateCity() {
         List<HistoryCity> historyCityList = new ArrayList<>();
-
-        Integer[] integers = new Integer[15];
-//        MyAsyncTask asyncTask = new MyAsyncTask();
-//        for (int i = 0; i < 15; i++) {
-//            integers[i] = i;
-//        }
-//        asyncTask.execute(integers);
-
         for (int i = 0; i < 15; i++) {
-            historyCityList.add(new HistoryCity(getDate(i), RandomList(),
+            historyCityList.add(new HistoryCity(getDate(i), "Icon_weather",
                     ((int) (Math.random() * 10 + i)) + " \u2103"));
         }
-
-        Intent intent = new Intent((getActivity().getApplicationContext()), MyService.class);
+        Intent intent = new Intent((Objects.requireNonNull(getActivity()).getApplicationContext()), MyService.class);
         intent.putExtra(MyService.CITY, cityName);
         intent.putExtra(MyService.CURRENTDATE, getDate(0));
         getActivity().startService(intent);
@@ -80,90 +99,141 @@ public class MainFragment extends Fragment {
         return dateFormat.format(date.getTime());
     }
 
-    private void updateWeatherData(final String city) {
-        new Thread() {
-            @Override
-            public void run() {
-                final JSONObject jsonObject = WeatherCurrentDay.getJSONData(city);
-                if (jsonObject == null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(), "Place not found", Toast.LENGTH_LONG).show();
+    private void updateWeatherOneDayData(final String city) {
+        OpenWeatherRepo.getSingleton().getAPI().loadOneDayWeather(city + ",ru",
+                "762ee61f52313fbd10a4eb54ae4d4de2", "metric")
+                .enqueue(new Callback<WeatherRequestRestOneDayModel>() {
+                    @Override
+                    public void onResponse(@NonNull Call<WeatherRequestRestOneDayModel> call,
+                                           @NonNull Response<WeatherRequestRestOneDayModel> response) {
+                        if (response.body() != null && response.isSuccessful()) {
+                            renderWeatherOneDay(response.body());
                         }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            renderWeather(jsonObject);
-                        }
-                    });
-                }
-            }
-        }.start();
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<WeatherRequestRestOneDayModel> call, @NotNull Throwable t) {
+                        Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), getString(R.string.network_error),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void renderWeather(JSONObject jsonObject) {
-        Timber.d("json: " + jsonObject.toString());
-        try {
-            JSONObject details = jsonObject.getJSONArray("weather").getJSONObject(0);
-            JSONObject main = jsonObject.getJSONObject("main");
-            JSONObject wind = jsonObject.getJSONObject("wind");
+    private void updateWeatherFiveDayData(final String city) {
+        OpenWeatherRepo.getSingleton().getAPI().loadFiveDayWeather(city + ",ru",
+                "762ee61f52313fbd10a4eb54ae4d4de2", "metric")
+                .enqueue(new Callback<WeatherRequestRestFiveDayModel>() {
+                    @Override
+                    public void onResponse(@NonNull Call<WeatherRequestRestFiveDayModel> call,
+                                           @NonNull Response<WeatherRequestRestFiveDayModel> response) {
+                        if (response.body() != null && response.isSuccessful()) {
+                            renderWeatherFiveDay(response.body());
+                        }
+                    }
 
-            setDetails(details, main, wind);
-            setCurrentTemp(main);
-            setUpdatedText(jsonObject);
-            setWeatherIcon(details.getInt("id"),
-                    jsonObject.getJSONObject("sys").getLong("sunrise") * 1000,
-                    jsonObject.getJSONObject("sys").getLong("sunset") * 1000,
-                    details.getString("description"));
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            Timber.e("One or more fields not found in the JSON data");
+                    @Override
+                    public void onFailure(@NotNull Call<WeatherRequestRestFiveDayModel> call, @NotNull Throwable t) {
+                        Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), getString(R.string.network_error),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void renderWeatherOneDay(WeatherRequestRestOneDayModel model) {
+        setDetails(model.main.humidity, model.main.pressure, model.wind.speed);
+        setCurrentTemp(model.main.temp);
+        setUpdatedText(model.dt);
+        setWeatherIcon(model.weather[0].id,
+                model.sys.sunrise * 1000,
+                model.sys.sunset * 1000,
+                model.weather[0].description);
+    }
+
+    private void renderWeatherFiveDay(WeatherRequestRestFiveDayModel model) {
+        historyCityList = new ArrayList<>();
+        for (int i = 0; i <model.list.length ; i++) {
+            historyCityList.add(new HistoryCity(model.list[i].dt_txt, setWeatherFiveDayIcon(model.list[i].weather[0].id),
+                    ((int) model.list[i].main.temp) + " \u2103"));
         }
+    }
+    private String setWeatherFiveDayIcon(int actualId) {
+        int id = actualId / 100;
+        String imageURL = "https://image.flaticon.com/icons/png/512/103/103085.png";
+        if (actualId == 800) {
+                imageURL = "https://image.flaticon.com/icons/png/512/54/54455.png";
+
+        } else {
+            switch (id) {
+                case 2: {
+                    imageURL = "https://image.flaticon.com/icons/png/512/91/91981.png";
+                    break;
+                }
+                case 3: {
+                    imageURL = "https://image.flaticon.com/icons/png/512/106/106044.png";
+                    break;
+                }
+                case 5: {
+                    imageURL = "https://image.flaticon.com/icons/png/512/116/116251.png";
+                    break;
+                }
+                case 6: {
+                    imageURL = "https://image.flaticon.com/icons/png/512/52/52052.png";
+                    break;
+                }
+                case 7: {
+                    imageURL = "https://image.flaticon.com/icons/png/512/106/106055.png";
+                    break;
+                }
+                case 8: {
+                    imageURL = "https://image.flaticon.com/icons/png/512/53/53562.png";
+                    break;
+                }
+            }
+        }
+        return imageURL;
     }
 
     private void setWeatherIcon(int actualId, long sunrise, long sunset, String weather_description) {
         int id = actualId / 100;
-        String icon = "";
-
+        ImageView weather_icon = view.findViewById(R.id.weather_icon);
+        LoadImage loadImage = new LoadImage();
+        String imageURL = "https://image.flaticon.com/icons/png/512/103/103085.png";
         if (actualId == 800) {
             long currentTime = new Date().getTime();
             if (currentTime >= sunrise && currentTime < sunset) {
-                icon = "\u2600";
+                imageURL = "https://image.flaticon.com/icons/png/512/54/54455.png";
             } else {
-                icon = getString(R.string.weather_clear_night);
+                imageURL = "https://image.flaticon.com/icons/png/512/53/53381.png";
             }
         } else {
             switch (id) {
                 case 2: {
-                    icon = getString(R.string.weather_thunder);
+                    imageURL = "https://image.flaticon.com/icons/png/512/91/91981.png";
                     break;
                 }
                 case 3: {
-                    icon = getString(R.string.weather_drizzle);
+                    imageURL = "https://image.flaticon.com/icons/png/512/106/106044.png";
                     break;
                 }
                 case 5: {
-                    icon = getString(R.string.weather_rainy);
+                    imageURL = "https://image.flaticon.com/icons/png/512/116/116251.png";
                     break;
                 }
                 case 6: {
-                    icon = getString(R.string.weather_snowy);
+                    imageURL = "https://image.flaticon.com/icons/png/512/52/52052.png";
                     break;
                 }
                 case 7: {
-                    icon = getString(R.string.weather_foggy);
+                    imageURL = "https://image.flaticon.com/icons/png/512/106/106055.png";
                     break;
                 }
                 case 8: {
-                    icon = "\u2601";
-                    // icon = getString(R.string.weather_cloudy);
+                    imageURL = "https://image.flaticon.com/icons/png/512/53/53562.png";
                     break;
                 }
             }
         }
+        loadImage.Load(weather_icon, imageURL);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         String sunriseText = dateFormat.format(new Date(sunrise));
         TextView sunriseTextView = view.findViewById(R.id.sunrise);
@@ -171,86 +241,38 @@ public class MainFragment extends Fragment {
         String sunsetText = dateFormat.format(new Date(sunset));
         TextView sunsetTextView = view.findViewById(R.id.sunset);
         sunsetTextView.setText(sunsetText);
-        TextView weather_icon = view.findViewById(R.id.weather_icon);
-
         TextView weatherDescription = view.findViewById(R.id.weather_description);
         weatherDescription.setText(weather_description);
-        weather_icon.setText(icon);
     }
 
-    private void setUpdatedText(JSONObject jsonObject) throws JSONException {
+    private void setUpdatedText(long dt) {
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        String updateOn = dateFormat.format(new Date(jsonObject.getLong("dt") * 1000));
+        String updateOn = dateFormat.format(dt * 1000);
         String updatedText = "Last update: " + updateOn;
         TextView updatedTextView = view.findViewById(R.id.updatedTextView);
         updatedTextView.setText(updatedText);
     }
 
-    private void setCurrentTemp(JSONObject main) throws JSONException {
-        String currentTextText = String.format(Locale.getDefault(), "%.2f", main.getDouble("temp"))
-                + " \u2103";
+    private void setCurrentTemp(float temp) {
+        String currentTextText = String.format(Locale.getDefault(), "%.2f", temp) + " \u2103";
         TextView currentTemperatureTextView = view.findViewById(R.id.currentTemperatureTextView);
         currentTemperatureTextView.setText(currentTextText);
     }
 
-    private void setDetails(JSONObject details, JSONObject main, JSONObject wind) throws JSONException {
-        String PressureText = main.getString("pressure") + " hPa";
+    private void setDetails(int humidity, int pressure, float speed) {
+        String PressureText = pressure + " hPa";
         TextView PressureTextView = view.findViewById(R.id.Pressure);
         PressureTextView.setText(PressureText);
-
-        String HumidityText = main.getString("humidity") + " %";
+        String HumidityText = humidity + " %";
         TextView HumidityTextView = view.findViewById(R.id.Humidity);
         HumidityTextView.setText(HumidityText);
-        String WindText = wind.getString("speed") + " m/s";
+        String WindText = speed + " m/s";
         TextView WindTextView = view.findViewById(R.id.Wind);
         WindTextView.setText(WindText);
-
-    }
-
-//    private void setPlaceName(JSONObject jsonObject) throws JSONException {
-//    private void setPlaceName(JSONObject jsonObject) throws JSONException {
-//        String cityText = jsonObject.getString("name").toUpperCase() + ", "
-//                + jsonObject.getJSONObject("sys").getString("country");
-//        cityTextView.setText(cityText);
-//    }
-
-    private int RandomList() {
-        if (Math.random() < 0.2) {
-            return R.drawable.light_rain;
-        } else if (Math.random() > 0.2 && Math.random() < 0.4) {
-            return R.drawable.little_cloudy;
-        } else if (Math.random() > 0.4 && Math.random() < 0.6) {
-            return R.drawable.overcast;
-        } else if (Math.random() > 0.6 && Math.random() < 0.8) {
-            return R.drawable.rain;
-        } else {
-            return R.drawable.sun;
-        }
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_main, container, false);
-
-        cityDataBaseHelper = ((App) getActivity().getApplication()).getCityDataBaseHelper();
-        database = cityDataBaseHelper.getReadableDatabase();
-
-        textViewAmbientTemperature = view.findViewById(R.id.ambient_temperature);
-        textViewRelativeHumidity = view.findViewById(R.id.relative_humidity);
-
-        String city = ((App) getActivity().getApplication()).getPreferences().getString(Preferences.Key.CITY);
-        Timber.d(city);
-        if (!city.isEmpty()) {
-            loadCity(city, view);
-        }
-        setUpRecyclerView(view.findViewById(R.id.linerHistory));
-        showSensors();
-        updateWeatherData(cityName);
-        return view;
     }
 
     private void showSensors() {
-        sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) Objects.requireNonNull(getActivity()).getSystemService(Context.SENSOR_SERVICE);
         sensorAmbientTemperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
         sensorRelativeHumidity = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
         if (sensorAmbientTemperature != null) {
@@ -328,12 +350,12 @@ public class MainFragment extends Fragment {
             int APP_PREFERENCES_pressure_wetness = cursor.getInt(cursor.getColumnIndex(CityDataBaseHelper.APP_PREFERENCES_pressure_wetness));
             TextView textViewCity = view.findViewById(R.id.City);
             textViewCity.setText(cityName);
-            TextView textView4 = view.findViewById(R.id.Pressure);
-            TextView textView5 = view.findViewById(R.id.Humidity);
-            TextView textView6 = view.findViewById(R.id.Wind);
-            textView4.setVisibility(APP_PREFERENCES_pressure_switch == 0 ? View.GONE : View.VISIBLE);
-            textView5.setVisibility(APP_PREFERENCES_pressure_wetness == 0 ? View.GONE : View.VISIBLE);
-            textView6.setVisibility(APP_PREFERENCES_pressure_speed_wind == 0 ? View.GONE : View.VISIBLE);
+            TextView Pressure = view.findViewById(R.id.Pressure);
+            TextView Humidity = view.findViewById(R.id.Humidity);
+            TextView Wind = view.findViewById(R.id.Wind);
+            Pressure.setVisibility(APP_PREFERENCES_pressure_switch == 0 ? View.GONE : View.VISIBLE);
+            Humidity.setVisibility(APP_PREFERENCES_pressure_wetness == 0 ? View.GONE : View.VISIBLE);
+            Wind.setVisibility(APP_PREFERENCES_pressure_speed_wind == 0 ? View.GONE : View.VISIBLE);
         }
         cursor.close();
     }
@@ -351,19 +373,5 @@ public class MainFragment extends Fragment {
         sensorManager.unregisterListener(listenerRelativeHumidity, sensorRelativeHumidity);
         sensorManager.unregisterListener(listenerAmbientTemperature, sensorAmbientTemperature);
     }
-
-//    private class MyAsyncTask extends AsyncTask<Integer, String, String> {
-//
-//        @Override
-//        protected String doInBackground(Integer... integers) {
-//
-//
-//
-//
-//            return null;
-//        }
-//
-//
-//    }
 }
 

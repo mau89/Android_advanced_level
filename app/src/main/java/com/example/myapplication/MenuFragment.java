@@ -3,7 +3,6 @@ package com.example.myapplication;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,15 +20,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.data.CityAdd;
 import com.example.myapplication.data.CityDataBaseHelper;
 import com.example.myapplication.data.VillageAdd;
+import com.example.myapplication.rest.OpenWeatherRepo;
+import com.example.myapplication.rest.entities.WeatherRequestRestOneDayModel;
 import com.example.myapplication.utils.Preferences;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class MenuFragment extends Fragment {
@@ -39,7 +43,6 @@ public class MenuFragment extends Fragment {
     private static final int IDM_OPEN = 101;
     private View view;
     private int idCity;
-    private final Handler handler = new Handler();
     private String currentTextText;
     private CityAddAdapter cityAddAdapter;
 
@@ -47,16 +50,17 @@ public class MenuFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_menu, container, false);
 
-        cityDataBaseHelper = ((App) getActivity().getApplication()).getCityDataBaseHelper();
+        cityDataBaseHelper = ((App) Objects.requireNonNull(getActivity()).getApplication()).getCityDataBaseHelper();
         database = cityDataBaseHelper.getReadableDatabase();
+
         view.findViewById(R.id.add_location).setOnClickListener(v -> {
             ((App) getActivity().getApplication()).getPreferences().putString("", Preferences.Key.EDIT_CITY);
-            getFragmentManager().beginTransaction()
+            Objects.requireNonNull(getFragmentManager()).beginTransaction()
                     .replace(R.id.container, new AddingCitiesFragment())
                     .addToBackStack(MenuFragment.class.getName())
                     .commit();
         });
-        Timber.d("onCreateview");
+        Timber.d("onCreateView");
         return view;
     }
 
@@ -74,25 +78,24 @@ public class MenuFragment extends Fragment {
                 CityDataBaseHelper.APP_PREFERENCES_pressure_wetness};
         Cursor cursor = database.query(
                 CityDataBaseHelper.TABLE_CONTACTS,
-                projection,            // столбцы
-                null,                  // столбцы для условия WHERE
-                null,                  // значения для условия WHERE
-                null,                  // Don't group the rows
-                null,                  // Don't filter by row groups
+                projection,
+                null,
+                null,
+                null,
+                null,
                 null);
         cityAdds.clear();
         while (cursor.moveToNext()) {
             int currentID = cursor.getInt(cursor.getColumnIndex(CityDataBaseHelper.KEY_ID));
-            String APP_PREFERENCES_cityName = cursor.getString(cursor.getColumnIndex(CityDataBaseHelper.APP_PREFERENCES_cityName));
-            Timber.d(APP_PREFERENCES_cityName);
-            updateWeatherData(APP_PREFERENCES_cityName);
-            if (APP_PREFERENCES_cityName == null) {
+            String cityName = cursor.getString(cursor.getColumnIndex(CityDataBaseHelper.APP_PREFERENCES_cityName));
+            Timber.d(cityName);
+            updateWeatherData(cityName);
+            if (cityName == null) {
                 deleteRow(String.valueOf(currentID));
-            } else if (APP_PREFERENCES_cityName.substring(0, 2).equals("п.")) {
-
-                cityAdds.add(new VillageAdd(APP_PREFERENCES_cityName, currentTextText, currentID));
+            } else if (cityName.substring(0, 2).equals("п.")) {
+                cityAdds.add(new VillageAdd(cityName, currentTextText, currentID));
             } else {
-                cityAdds.add(new CityAdd(APP_PREFERENCES_cityName, currentTextText, currentID));
+                cityAdds.add(new CityAdd(cityName, currentTextText, currentID));
             }
         }
         setUpRecyclerView(view.findViewById(R.id.linear_city));
@@ -100,55 +103,45 @@ public class MenuFragment extends Fragment {
     }
 
     private void updateWeatherData(final String city) {
-        new Thread() {
-            @Override
-            public void run() {
-                final JSONObject jsonObject = WeatherCurrentDay.getJSONData(city);
-                if (jsonObject == null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(), "Place not found", Toast.LENGTH_LONG).show();
+        OpenWeatherRepo.getSingleton().getAPI().loadOneDayWeather(city + ",ru",
+                "762ee61f52313fbd10a4eb54ae4d4de2", "metric")
+                .enqueue(new Callback<WeatherRequestRestOneDayModel>() {
+                    @Override
+                    public void onResponse(@NonNull Call<WeatherRequestRestOneDayModel> call,
+                                           @NonNull Response<WeatherRequestRestOneDayModel> response) {
+                        if (response.body() != null && response.isSuccessful()) {
+                            renderWeather(response.body());
                         }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            renderWeather(jsonObject);
-                        }
-                    });
-                }
-            }
-        }.start();
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<WeatherRequestRestOneDayModel> call, @NotNull Throwable t) {
+                        Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), getString(R.string.network_error),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void renderWeather(JSONObject jsonObject) {
-        Timber.d("json: " + jsonObject.toString());
-        try {
-            JSONObject details = jsonObject.getJSONArray("weather").getJSONObject(0);
-            JSONObject main = jsonObject.getJSONObject("main");
-
-            setCurrentTemp(main);
-
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            Timber.e("One or more fields not found in the JSON data");
-        }
+    private void renderWeather(WeatherRequestRestOneDayModel model) {
+        setCurrentTemp(model.main.temp);
     }
 
-    private void setCurrentTemp(JSONObject main) throws JSONException {
-        currentTextText = String.format(Locale.getDefault(), "%.1f", main.getDouble("temp"))
-                + " \u2103";
+    private void setCurrentTemp(float temp) {
+        currentTextText = String.format(Locale.getDefault(), "%.1f", temp) + " \u2103";
         cityAddAdapter.notifyDataSetChanged();
     }
 
     private void setUpRecyclerView(LinearLayout historyLayout) {
-
         View historyView = LayoutInflater.from(getActivity())
                 .inflate(R.layout.layout_city_list, historyLayout, false);
         RecyclerView recyclerView = historyView.findViewById(R.id.recycler_city_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        setCityAdapter();
+        recyclerView.setAdapter(cityAddAdapter);
+        historyLayout.addView(historyView);
+    }
+
+    private void setCityAdapter() {
         cityAddAdapter = new CityAddAdapter(cityAdds);
         cityAddAdapter.notifyDataSetChanged();
         cityAddAdapter.setOnClickCity(objects -> {
@@ -157,7 +150,7 @@ public class MenuFragment extends Fragment {
             } else {
                 idCity = ((VillageAdd) objects).getCurrentID();
             }
-            ((App) getActivity().getApplication()).getPreferences().putString(String.valueOf(idCity), Preferences.Key.CITY);
+            ((App) Objects.requireNonNull(getActivity()).getApplication()).getPreferences().putString(String.valueOf(idCity), Preferences.Key.CITY);
             getActivity().onBackPressed();
         });
         cityAddAdapter.setOnLongClickCity(objects -> {
@@ -166,34 +159,35 @@ public class MenuFragment extends Fragment {
             } else {
                 idCity = ((VillageAdd) objects).getCurrentID();
             }
-            ((App) getActivity().getApplication()).getPreferences().putString(String.valueOf(idCity), Preferences.Key.EDIT_CITY);
+            ((App) Objects.requireNonNull(getActivity()).getApplication()).getPreferences()
+                    .putString(String.valueOf(idCity), Preferences.Key.EDIT_CITY);
+            assert getFragmentManager() != null;
             getFragmentManager().beginTransaction()
                     .replace(R.id.container, new AddingCitiesFragment())
                     .addToBackStack(MenuFragment.class.getName())
                     .commit();
         });
-//        cityAddAdapter.setOnClickDelButton(object -> {
-//            Toast.makeText(getActivity(),"asfsdf",Toast.LENGTH_SHORT).show();
-//            if (object instanceof CityAdd) {
-//                idCity = ((CityAdd) object).getCurrentID();
-//            } else {
-//                idCity = ((VillageAdd) object).getCurrentID();
-//            }
-//            deleteRow(String.valueOf(idCity));
-//            cityAddAdapter.removeItem(object);
-//        });
-        recyclerView.setAdapter(cityAddAdapter);
-        historyLayout.addView(historyView);
+        //TODO не реализовано удаление городов
+        //cityAddAdapter.setOnClickDelButton(object -> {
+        //Toast.makeText(getActivity(),"asfsdf",Toast.LENGTH_SHORT).show();
+        //if (object instanceof CityAdd) {
+        //idCity = ((CityAdd) object).getCurrentID();
+        //} else {
+        //idCity = ((VillageAdd) object).getCurrentID();
+        //}
+        //deleteRow(String.valueOf(idCity));
+        //cityAddAdapter.removeItem(object);
+        //});
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(@NotNull ContextMenu menu, @NotNull View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(Menu.NONE, IDM_OPEN, Menu.NONE, "Изменить");
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(@NotNull MenuItem item) {
         //startActivity(new Intent(this, AddingCitiesFragment.class));
         return super.onContextItemSelected(item);
     }

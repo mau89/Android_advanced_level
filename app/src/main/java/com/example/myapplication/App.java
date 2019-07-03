@@ -36,7 +36,6 @@ public class App extends Application {
     }
 
     public static int getScreenWidth(Context context) {
-
         if (screenWidth == 0) {
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();

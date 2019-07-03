@@ -10,13 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.Objects;
+
 public class AboutDeveloperFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_about_the_developer, container, false);
         Button button = view.findViewById(R.id.ok);
-        button.setOnClickListener(v -> getActivity().onBackPressed());
+        button.setOnClickListener(v -> Objects.requireNonNull(getActivity()).onBackPressed());
         return view;
     }
 }

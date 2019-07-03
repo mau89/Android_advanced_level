@@ -5,7 +5,7 @@ import java.util.Objects;
 public class CityAdd {
     private String stringCity;
     private String stringTemperature;
-    int currentID;
+    private int currentID;
 
     public CityAdd(String stringCity, String stringTemperature, int currentID) {
         this.stringCity = stringCity;
