@@ -16,6 +16,4 @@ public interface IOpenWeather {
     Call<WeatherRequestRestFiveDayModel> loadFiveDayWeather(@Query("q") String city,
                                                            @Query("appid") String keyApi,
                                                            @Query("units") String units);
-
-
 }

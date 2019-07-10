@@ -6,7 +6,7 @@ public class WeatherRequestRestFiveDayModel {
     @SerializedName("cod")
     public int cod;
     @SerializedName("message")
-    public double message;
+    public float message;
     @SerializedName("cnt")
     public int cnt;
     @SerializedName("list")

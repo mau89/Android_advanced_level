@@ -72,8 +72,7 @@ public class MainFragment extends Fragment {
         if (!city.isEmpty()) {
             loadCity(city, view);
         }
-        updateWeatherFiveDayData(city);
-        setUpRecyclerView(view.findViewById(R.id.linerHistory));
+        updateWeatherFiveDayData(cityName);
         showSensors();
         updateWeatherOneDayData(cityName);
         return view;
@@ -130,9 +129,8 @@ public class MainFragment extends Fragment {
                             renderWeatherFiveDay(response.body());
                         }
                     }
-
                     @Override
-                    public void onFailure(@NotNull Call<WeatherRequestRestFiveDayModel> call, @NotNull Throwable t) {
+                    public void onFailure(@NotNull Call<WeatherRequestRestFiveDayModel> call1, @NotNull Throwable t) {
                         Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), getString(R.string.network_error),
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -151,16 +149,19 @@ public class MainFragment extends Fragment {
 
     private void renderWeatherFiveDay(WeatherRequestRestFiveDayModel model) {
         historyCityList = new ArrayList<>();
-        for (int i = 0; i <model.list.length ; i++) {
+        for (int i = 0; i < model.list.length; i++) {
             historyCityList.add(new HistoryCity(model.list[i].dt_txt, setWeatherFiveDayIcon(model.list[i].weather[0].id),
                     ((int) model.list[i].main.temp) + " \u2103"));
         }
+        setUpRecyclerView(view.findViewById(R.id.linerHistory));
+
     }
+
     private String setWeatherFiveDayIcon(int actualId) {
         int id = actualId / 100;
         String imageURL = "https://image.flaticon.com/icons/png/512/103/103085.png";
         if (actualId == 800) {
-                imageURL = "https://image.flaticon.com/icons/png/512/54/54455.png";
+            imageURL = "https://image.flaticon.com/icons/png/512/54/54455.png";
 
         } else {
             switch (id) {
@@ -319,7 +320,7 @@ public class MainFragment extends Fragment {
                 .inflate(R.layout.layout_weather_history, historyLayout, false);
         RecyclerView recyclerView = historyView.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
-        recyclerView.setAdapter(new HistoryDayAdapter(generateCity()));
+        recyclerView.setAdapter(new HistoryDayAdapter(historyCityList));
         historyLayout.addView(historyView);
     }
 
