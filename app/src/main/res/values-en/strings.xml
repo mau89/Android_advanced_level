@@ -5,5 +5,28 @@
     <string name="pressure_wetness" translatable="false">Display wetness</string>
     <string name="spinner_headline" translatable="false">Select historyCity</string>
     <string name="app_name_weather">Weather</string>
-    <string name="addcity">Save settings</string>
+    <string name="addCity">Save settings</string>
+    <string name="tool_bar_search">Search</string>
+    <string name="info">info</string>
+    <string name="action_settings">Add city</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_send">Contact with the developer</string>
+    <string name="menu_share">About the developer</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">User</string>
+    <string name="nav_header_subtitle">User data</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="developer">Developer Mikhailishin Alexander</string>
+    <string name="send">Send</string>
+    <string name="network_error">" Network problems!"</string>
+    <string name="ok">OK</string>
+    <string name="Information_in_development">Information in development</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
+    <string name="about_the_developer">About the developer</string>
+    <string name="Message_to_developer">Message to developer</string>
 </resources>

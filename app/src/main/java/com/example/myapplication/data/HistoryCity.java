@@ -1,14 +1,13 @@
 package com.example.myapplication.data;
 
-
 import java.util.Objects;
 
 public final class HistoryCity {
     private String stringDay;
-    private int drawableImageViewDay;
+    private String drawableImageViewDay;
     private String stringTextViewTemperatureDay;
 
-    public HistoryCity(String stringDay, int drawableImageViewDay, String stringTextViewTemperatureDay) {
+    public HistoryCity(String stringDay, String drawableImageViewDay, String stringTextViewTemperatureDay) {
         this.stringDay = stringDay;
         this.drawableImageViewDay = drawableImageViewDay;
         this.stringTextViewTemperatureDay = stringTextViewTemperatureDay;
@@ -18,7 +17,7 @@ public final class HistoryCity {
         return stringDay;
     }
 
-    public int getDrawableImageViewDay() {
+    public String getDrawableImageViewDay() {
         return drawableImageViewDay;
     }
 

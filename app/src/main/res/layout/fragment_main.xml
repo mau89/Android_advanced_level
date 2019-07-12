@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -16,22 +15,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="7"
             android:orientation="horizontal"
-            android:weightSum="10">
+            android:weightSum="30">
 
-            <ImageButton
-                android:id="@+id/menu"
+            <TextView
+                android:id="@+id/ambient_temperature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_weight="0"
-                android:backgroundTint="#03A9F5"
+                android:layout_gravity="center"
+                android:layout_weight="10"
                 android:gravity="center"
-                android:onClick="menu"
-                android:scaleType="fitXY"
-                android:src="@drawable/menu"
-                tools:ignore="OnClick" />
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/City"
@@ -40,49 +35,44 @@
                 android:layout_gravity="center"
                 android:layout_weight="10"
                 android:gravity="center"
-                android:text="City"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="25sp" />
 
-            <ImageButton
-                android:id="@+id/info"
+            <TextView
+                android:id="@+id/relative_humidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_weight="0"
-                android:backgroundTint="#03A9F5"
+                android:layout_gravity="center"
+                android:layout_weight="10"
                 android:gravity="center"
-                android:onClick="info"
-                android:scaleType="fitXY"
-                android:src="@drawable/info"
-                tools:ignore="OnClick" />
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/weather_icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="20"
-            app:srcCompat="@drawable/sun" />
-
+            android:textSize="80sp" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/weather_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="SUN"
+
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/currentTemperatureTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
             android:gravity="center"
-            android:text="30 \u2103"
             android:textColor="#FFFFFF"
             android:textSize="50sp" />
 
@@ -93,32 +83,29 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/Pressure"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/Pressure"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/Humidity"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/Humidity"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/Wind"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/Wind_speed"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>
@@ -129,7 +116,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="Next 14 Days"
+            android:text="@string/next_days"
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
 
@@ -142,38 +129,35 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/updatedTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
-            android:text="@string/TextUpdate"
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <TextView
-                android:id="@+id/textView14"
+                android:id="@+id/sunrise"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left|center"
-                android:text="05:57 sunrise"
+                android:gravity="start|center"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/sunset"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="right|center"
-                android:text="17:44 sunset"
+                android:gravity="end|center"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>

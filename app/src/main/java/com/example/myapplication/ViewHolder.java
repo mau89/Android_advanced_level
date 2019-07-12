@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ViewHolder extends RecyclerView.ViewHolder {
 
     TextView textViewDay;
-    ImageView imageViewDay;
+    TextView imageViewDay;
     TextView textViewTemperatureDay;
 
     public ViewHolder(@NonNull View itemView) {
