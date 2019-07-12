@@ -72,6 +72,8 @@ public class MainFragment extends Fragment {
         if (!city.isEmpty()) {
             loadCity(city, view);
         }
+        Timber.i(city);
+        Timber.i(cityName);
         updateWeatherFiveDayData(cityName);
         showSensors();
         updateWeatherOneDayData(cityName);
@@ -118,8 +120,10 @@ public class MainFragment extends Fragment {
                 });
     }
 
-    private void updateWeatherFiveDayData(final String city) {
-        OpenWeatherRepo.getSingleton().getAPI().loadFiveDayWeather(city + ",ru",
+    private void updateWeatherFiveDayData(final String city1) {
+        //  Toast.makeText(getActivity(),city1,Toast.LENGTH_SHORT).show();
+        Timber.d("Зашел999999999");
+        OpenWeatherRepo.getSingleton().getAPI().loadFiveDayWeather("Moscow",
                 "762ee61f52313fbd10a4eb54ae4d4de2", "metric")
                 .enqueue(new Callback<WeatherRequestRestFiveDayModel>() {
                     @Override
@@ -127,12 +131,16 @@ public class MainFragment extends Fragment {
                                            @NonNull Response<WeatherRequestRestFiveDayModel> response) {
                         if (response.body() != null && response.isSuccessful()) {
                             renderWeatherFiveDay(response.body());
+                            Timber.d("Зашел123");
+                            Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), "зашел !!!!!!!!!!!!!!!!!!!!!!!!!",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                     @Override
                     public void onFailure(@NotNull Call<WeatherRequestRestFiveDayModel> call1, @NotNull Throwable t) {
                         Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), getString(R.string.network_error),
                                 Toast.LENGTH_SHORT).show();
+                        Timber.d("Зашел321");
                     }
                 });
     }
@@ -154,7 +162,6 @@ public class MainFragment extends Fragment {
                     ((int) model.list[i].main.temp) + " \u2103"));
         }
         setUpRecyclerView(view.findViewById(R.id.linerHistory));
-
     }
 
     private String setWeatherFiveDayIcon(int actualId) {
@@ -162,7 +169,6 @@ public class MainFragment extends Fragment {
         String imageURL = "https://image.flaticon.com/icons/png/512/103/103085.png";
         if (actualId == 800) {
             imageURL = "https://image.flaticon.com/icons/png/512/54/54455.png";
-
         } else {
             switch (id) {
                 case 2: {
